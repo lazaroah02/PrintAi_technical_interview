@@ -8,6 +8,7 @@ import redis
 import json
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 # --- Config logging ---
 setup_logging("app")
@@ -18,6 +19,10 @@ load_dotenv()
 app = Flask(__name__)
 api = Api(app)
 
+#cors config
+CORS(app, resources={
+    r"/*": {"origins": ["http://localhost:3000"]},
+})
 
 class HelloWorld(Resource):
     def get(self):

@@ -1,0 +1,84 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "path": "ask",
+          "method": "POST",
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "WebhookAsk",
+        "name": "Webhook /ask",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 1,
+        "position": [200, 300]
+      },
+      {
+        "parameters": {
+          "agentType": "customTools",
+          "tools": [
+            {
+              "name": "Books Tool",
+              "type": "restApi",
+              "description": "Query book data from FastAPI + Redis",
+              "url": "http://localhost:8000/books?query={{ $json[\"body\"][\"query\"] }}",
+              "method": "GET"
+            },
+            {
+              "name": "Hacker News Tool",
+              "type": "restApi",
+              "description": "Get real-time Hacker News headlines",
+              "url": "http://localhost:8000/headlines?query={{ $json[\"body\"][\"query\"] }}",
+              "method": "GET"
+            }
+          ],
+          "inputPrompt": "El usuario ha hecho esta consulta: {{$json[\"body\"][\"query\"]}}.\nUsa los tools disponibles para extraer información de libros y titulares de Hacker News.\nDevuelve una respuesta útil basada en los datos que consigas."
+        },
+        "id": "AIAgent",
+        "name": "AI Agent",
+        "type": "n8n-nodes-base.aiAgent",
+        "typeVersion": 1,
+        "position": [500, 300]
+      },
+      {
+        "parameters": {
+          "responseMode": "lastNode",
+          "options": {}
+        },
+        "id": "RespondWebhook",
+        "name": "Return Result",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1,
+        "position": [800, 300]
+      }
+    ],
+    "connections": {
+      "Webhook /ask": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Return Result",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": true,
+    "name": "AI Assistant with FastAPI Tools",
+    "settings": {},
+    "tags": []
+  }
+  
