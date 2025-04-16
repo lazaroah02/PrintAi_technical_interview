@@ -4,11 +4,14 @@ from app.scraping.scrape_books import scrape_books
 # Crear la instancia de Celery
 celery = Celery(
     "tasks",
-    broker="redis://localhost:6379/0",  # Usando Redis como broker
-    backend="redis://localhost:6379/0"  # Para guardar estado
+    broker="redis://redis:6379/0",  # Usando Redis como broker
+    backend="redis://redis:6379/0"  # Para guardar estado
 )
 
 @celery.task
 def scrape_books_task():
-    scrape_books()
-    return "Scraping completo"
+    try:
+        scrape_books(5)
+        return "Task Finished. Access to the books on /books"
+    except:
+        return "Error in the task"

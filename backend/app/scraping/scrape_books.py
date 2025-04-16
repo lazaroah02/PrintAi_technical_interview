@@ -7,9 +7,11 @@ from functools import wraps
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import WebDriverException, TimeoutException
+from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
 from app.loggin_config import setup_logging
+import os
+from dotenv import load_dotenv
 
 
 # --- Retry Decorator ---
@@ -35,10 +37,11 @@ def retry(max_attempts=3, delay=2):
 def scrape_books(books_limit=100):
     # chromedriver
     options = Options()
-    options.add_argument("--headless")  # Hide browser window
-    options.add_argument("--disable-gpu")  # Optional: improve compatibility
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
-    options.add_argument("--log-level=3")
 
     driver = None
 
@@ -119,26 +122,31 @@ def scrape_books(books_limit=100):
                     logging.warning(f"Failed to process a book: {e}")
 
             page += 1
-    except WebDriverException as e:
-        logging.critical(f"Failed to start WebDriver: {e}")
-        raise
+
+        # save into redis
+        logging.info(f"Saving {len(books_data)} books into redis ...")
+        save_into_redis_database(books_data)
+
+        logging.info("Scraping finished.")  
     except Exception as e:
         logging.error(f"Unexpected error during scraping: {e}")
         raise
     finally:
-        driver.quit()
+        if driver:
+            driver.quit()
         logging.info("Browser closed.")
-
-    # save into redis
-    save_into_redis_database(books_data)
-
-    logging.info("Scraping finished.")
 
 
 def save_into_redis_database(books_data):
-    # redis database connection
     try:
-        r = redis.Redis(host='localhost', port=6379, db=0)
+        # Load .env
+        load_dotenv()
+        # redis database connection
+        REDIS_HOST = os.getenv("REDIS_HOST")
+        REDIS_PORT = int(os.getenv("REDIS_PORT", 6379)) 
+        REDIS_DB = int(os.getenv("REDIS_DB", 0))
+        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
+
         for book in books_data:
             book_id = hashlib.md5(book['url'].encode('utf-8')).hexdigest()
             redis_key = f"book:{book_id}"
@@ -146,6 +154,7 @@ def save_into_redis_database(books_data):
         logging.info(f"Stored {len(books_data)} books into Redis.")
     except Exception as e:
         logging.error(f"Failed to store data in Redis: {e}")
+        raise
 
 
 if __name__ == "__main__":

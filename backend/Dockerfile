@@ -23,7 +23,7 @@ COPY . /app
 ENV PYTHONPATH=/app
 
 # Instalar dependencias de Python
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Variables de entorno para Selenium
 ENV CHROME_BIN=/usr/bin/chromium
