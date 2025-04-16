@@ -11,7 +11,7 @@ celery = Celery(
 @celery.task
 def scrape_books_task():
     try:
-        scrape_books(5)
+        scrape_books()
         return "Task Finished. Access to the books on /books"
     except:
         return "Error in the task"

@@ -43,9 +43,7 @@ class Init(Resource):
 
 class Headlines(Resource):
     def get(self):
-        page = request.args.get('page')
-        if page is None:
-            page = 1
+        page = request.args.get('page', 1)
         try:
             stories = get_hackernews_top_stories(page)
             return {

@@ -13,7 +13,12 @@ services:
       - ./backend:/app
     working_dir: /app
     command: python app/main.py
-
+  init_scraper:
+    image: curlimages/curl
+    depends_on:
+      - web
+    entrypoint: >
+      sh -c "sleep 10 && curl -X POST http://web:5000/init"
   worker:
     build:
       context: ./backend
