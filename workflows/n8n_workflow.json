@@ -96,7 +96,7 @@
             {
                 "parameters": {
                     "toolDescription": "Get the books",
-                    "url": "http://api:5000/books"
+                    "url": "http://api:5000/books?page=1&limit=100"
                 },
                 "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
                 "typeVersion": 1.1,
