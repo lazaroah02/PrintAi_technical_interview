@@ -12,13 +12,13 @@ PrintAi Technical Project
 
 ## Configuration
 1. Add required .env files
-- At /backend/.env
+- At backend/.env
 ```
 REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_DB=0
 ```
-- At /workflows/.env
+- At workflows/.env
 ```/workflows/.env
 N8N_RUNNERS_ENABLED=true
 ```
