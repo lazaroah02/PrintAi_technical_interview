@@ -12,13 +12,15 @@ PrintAi Technical Project
 
 ## Configuration
 1. Add required .env files
-/backend/.env
+```/backend/.env
 REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_DB=0
+```
 
-/workflows/.env
+```/workflows/.env
 N8N_RUNNERS_ENABLED=true
+```
 
 ## Installation
 3. Build and run the Docker container:
@@ -35,11 +37,11 @@ N8N_RUNNERS_ENABLED=true
 - Workflows and credentials for n8n are automatic loaded
 - Books scraping starts automatically and may take some time to finish.
 
-2. Access the n8n interface at: `http://localhost:5678` and **activate** the workflow.(Will be automatically activated soon)
-   ```
-3. Access the chatbot interface in your browser at `http://localhost:3000`.
+2. Access the n8n interface at: http://localhost:5678 and **activate** the workflow.(Will be automatically activated soon)
+   
+3. Access the chatbot interface in your browser at http://localhost:3000.
 
-API Accessible by http://localhost:5000
+API Accessible by `http://localhost:5000`
 
 
 
