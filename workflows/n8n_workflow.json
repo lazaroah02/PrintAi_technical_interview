@@ -82,7 +82,16 @@
             {
                 "parameters": {
                     "toolDescription": "Get the top news of Hacker News",
-                    "url": "http://api:5000/headlines"
+                    "url": "http://api:5000/headlines",
+                    "sendQuery": true,
+                    "parametersQuery": {
+                    "values": [
+                        {
+                        "name": "page",
+                        "valueProvider": "modelOptional"
+                        }
+                    ]
+                    }
                 },
                 "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
                 "typeVersion": 1.1,
