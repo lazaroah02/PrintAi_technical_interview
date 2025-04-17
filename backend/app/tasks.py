@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 # Crear la instancia de Celery
 load_dotenv()
-REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_HOST = os.getenv("REDIS_HOST", 'redis')
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 REDIS_DB = int(os.getenv("REDIS_DB", 0))
 celery = Celery(
