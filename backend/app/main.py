@@ -21,7 +21,7 @@ api = Api(app)
 
 #cors config
 CORS(app, resources={
-    r"/*": {"origins": ["http://localhost:3000"]},
+    r"/*": {"origins": "*"},
 })
 
 class HelloWorld(Resource):

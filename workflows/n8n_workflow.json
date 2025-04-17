@@ -1,84 +1,211 @@
-{
-    "nodes": [
-      {
-        "parameters": {
-          "path": "ask",
-          "method": "POST",
-          "responseMode": "lastNode",
-          "options": {}
-        },
-        "id": "WebhookAsk",
-        "name": "Webhook /ask",
-        "type": "n8n-nodes-base.webhook",
-        "typeVersion": 1,
-        "position": [200, 300]
-      },
-      {
-        "parameters": {
-          "agentType": "customTools",
-          "tools": [
+[
+    {
+        "createdAt": "2025-04-17T12:12:18.613Z",
+        "updatedAt": "2025-04-17T12:13:55.000Z",
+        "id": "lcf2jg0YvyMyMTxJ",
+        "name": "My workflow",
+        "active": true,
+        "nodes": [
             {
-              "name": "Books Tool",
-              "type": "restApi",
-              "description": "Query book data from FastAPI + Redis",
-              "url": "http://localhost:8000/books?query={{ $json[\"body\"][\"query\"] }}",
-              "method": "GET"
+                "parameters": {
+                    "httpMethod": "POST",
+                    "path": "ask",
+                    "responseMode": "lastNode",
+                    "options": {
+                        "responseContentType": "JSON"
+                    }
+                },
+                "id": "11ae0a37-ace0-4500-882d-03a117ede4a3",
+                "name": "Webhook /ask",
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 1,
+                "position": [
+                    -100,
+                    0
+                ],
+                "webhookId": "f0d17553-2f7e-408a-a69b-a111c6451098"
             },
             {
-              "name": "Hacker News Tool",
-              "type": "restApi",
-              "description": "Get real-time Hacker News headlines",
-              "url": "http://localhost:8000/headlines?query={{ $json[\"body\"][\"query\"] }}",
-              "method": "GET"
-            }
-          ],
-          "inputPrompt": "El usuario ha hecho esta consulta: {{$json[\"body\"][\"query\"]}}.\nUsa los tools disponibles para extraer información de libros y titulares de Hacker News.\nDevuelve una respuesta útil basada en los datos que consigas."
-        },
-        "id": "AIAgent",
-        "name": "AI Agent",
-        "type": "n8n-nodes-base.aiAgent",
-        "typeVersion": 1,
-        "position": [500, 300]
-      },
-      {
-        "parameters": {
-          "responseMode": "lastNode",
-          "options": {}
-        },
-        "id": "RespondWebhook",
-        "name": "Return Result",
-        "type": "n8n-nodes-base.respondToWebhook",
-        "typeVersion": 1,
-        "position": [800, 300]
-      }
-    ],
-    "connections": {
-      "Webhook /ask": {
-        "main": [
-          [
+                "parameters": {
+                    "assignments": {
+                        "assignments": [
+                            {
+                                "id": "2e07a487-8e7d-4117-90f7-ea9c7d56aa85",
+                                "name": "query.chatInput",
+                                "value": "={{ $json.query.chatInput }}",
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "type": "n8n-nodes-base.set",
+                "typeVersion": 3.4,
+                "position": [
+                    200,
+                    0
+                ],
+                "id": "58a6391c-7a43-4141-8511-bec3cd666b2b",
+                "name": "Edit Fields"
+            },
             {
-              "node": "AI Agent",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
-      "AI Agent": {
-        "main": [
-          [
+                "parameters": {
+                    "respondWith": "allIncomingItems",
+                    "options": {
+                        "responseCode": 200
+                    }
+                },
+                "type": "n8n-nodes-base.respondToWebhook",
+                "typeVersion": 1.1,
+                "position": [
+                    800,
+                    0
+                ],
+                "id": "9a3a86bd-3172-4b24-a9ab-51e7347a61dc",
+                "name": "Respond to Webhook"
+            },
             {
-              "node": "Return Result",
-              "type": "main",
-              "index": 0
+                "parameters": {
+                    "promptType": "define",
+                    "text": "={{ $json.query.chatInput }}",
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.agent",
+                "typeVersion": 1.8,
+                "position": [
+                    420,
+                    0
+                ],
+                "id": "38a4cea3-9bbc-4899-a0b1-02f75e06d131",
+                "name": "AI Agent"
+            },
+            {
+                "parameters": {
+                    "toolDescription": "Get the top news of Hacker News",
+                    "url": "http://api:5000/headlines"
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+                "typeVersion": 1.1,
+                "position": [
+                    500,
+                    300
+                ],
+                "id": "10f4582c-8c6e-4e2c-aa09-3aad94cf4623",
+                "name": "HTTP Request"
+            },
+            {
+                "parameters": {
+                    "toolDescription": "Get the books",
+                    "url": "http://api:5000/books"
+                },
+                "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+                "typeVersion": 1.1,
+                "position": [
+                    700,
+                    300
+                ],
+                "id": "5339b607-7836-4285-8c6a-18c2ce25a783",
+                "name": "HTTP Request1"
+            },
+            {
+                "parameters": {
+                    "options": {}
+                },
+                "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+                "typeVersion": 1,
+                "position": [
+                    160,
+                    280
+                ],
+                "id": "2bc4deab-eeb4-4169-a79a-c25b9728fcec",
+                "name": "OpenRouter Chat Model",
+                "credentials": {
+                    "openRouterApi": {
+                        "id": "jHchk9hmIymL9fir",
+                        "name": "OpenRouter account"
+                    }
+                }
             }
-          ]
-        ]
-      }
-    },
-    "active": true,
-    "name": "AI Assistant with FastAPI Tools",
-    "settings": {},
-    "tags": []
-  }
-  
+        ],
+        "connections": {
+            "Webhook /ask": {
+                "main": [
+                    [
+                        {
+                            "node": "Edit Fields",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Edit Fields": {
+                "main": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "AI Agent": {
+                "main": [
+                    [
+                        {
+                            "node": "Respond to Webhook",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "HTTP Request": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "HTTP Request1": {
+                "ai_tool": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_tool",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "OpenRouter Chat Model": {
+                "ai_languageModel": [
+                    [
+                        {
+                            "node": "AI Agent",
+                            "type": "ai_languageModel",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "staticData": null,
+        "meta": {
+            "templateCredsSetupCompleted": true,
+            "instanceId": "654494a1515665454d5a7043e0478e52333ffb9e97376b51c180b0fd7109a282"
+        },
+        "pinData": {},
+        "versionId": "dbb244a3-38d3-4998-b97d-4266cb987ebf",
+        "triggerCount": 0,
+        "tags": []
+    }
+]

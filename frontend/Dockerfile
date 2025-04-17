@@ -1,29 +1,29 @@
-# Etapa 1: Construcción
+# Stage 1: Build
 FROM node:18 AS build
 
-# Crear directorio de trabajo
+# Create working directory
 WORKDIR /app
 
-# Copiar los archivos de package.json y package-lock.json desde chatbot-ui
+# Copy package.json and package-lock.json files from chatbot-ui
 COPY chatbot-ui/package*.json ./
 
-# Instalar dependencias
+# Install dependencies
 RUN npm install
 
-# Copiar el resto de los archivos del proyecto desde chatbot-ui
+# Copy the rest of the project files from chatbot-ui
 COPY chatbot-ui/ ./
 
-# Construir la aplicación para producción
+# Build the application for production
 RUN npm run build
 
-# Etapa 2: Servir con nginx
+# Stage 2: Serve with nginx
 FROM nginx:alpine
 
-# Copiar los archivos construidos al directorio de nginx
+# Copy the built files to the nginx directory
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Exponer el puerto 80
+# Expose port 80
 EXPOSE 80
 
-# Comando por defecto para iniciar nginx
+# Default command to start nginx
 CMD ["nginx", "-g", "daemon off;"]
