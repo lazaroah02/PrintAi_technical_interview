@@ -13,11 +13,23 @@ services:
     command: python app/main.py
   
   init_scraper:
-    image: curlimages/curl
+    build:
+      context: ./backend/init_scraper
+      dockerfile: Dockerfile
     depends_on:
       - api
     entrypoint: >
-      sh -c "sleep 10 && curl -X POST http://api:5000/init"
+      sh -c "
+        sleep 10 &&
+        RESPONSE=$(curl -s http://api:5000/books) &&
+        TOTAL_BOOKS=$(echo $RESPONSE | jq '.total_books') &&
+        if [ \"$TOTAL_BOOKS\" -eq 0 ]; then
+          echo 'No books found. Initializing books scraper...';
+          curl -X POST http://api:5000/init;
+        else
+          echo \"Books already present: $TOTAL_BOOKS\";
+        fi
+      "
   
   worker:
     build:
@@ -57,5 +69,7 @@ services:
     entrypoint: >
       sh -c "n8n import:credentials --input=/data/n8n_credentials.json &&
              n8n import:workflow --input=/data/n8n_workflow.json &&
-             n8n start"
+             n8n update:workflow --id=lcf2jg0YvyMyMTxJ --active=true &&
+             n8n start
+             "
 
