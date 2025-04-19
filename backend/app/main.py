@@ -9,6 +9,7 @@ import json
 import os
 from dotenv import load_dotenv
 from flask_cors import CORS
+import requests
 
 # --- Config logging ---
 setup_logging("app")
@@ -127,6 +128,39 @@ class TaskStatus(Resource):
             "result": result
         }
 
+class StartInitialBooksScrape(Resource):
+    def post(self):
+        try:
+            logging.info("Fetching current books from /books endpoint...")
+            response = requests.get("http://api:5000/books")  
+
+            if response.status_code != 200:
+                logging.error(f"Failed to fetch books. Status code: {response.status_code}")
+                return {"message": "Failed to fetch books"}, 500
+
+            data = response.json()
+            total_books = data.get("total_books", 0)
+            logging.info(f"Total books found: {total_books}")
+
+            # If books exist, skip initialization
+            if total_books > 0:
+                logging.info("Books already present. Skipping initial scrape.")
+                return {"message": f"{total_books} books already present. Skipping scraper."}, 200
+
+            # If no books, trigger the scraper
+            logging.info("No books found. Triggering scraper via /init...")
+            init_response = requests.post("http://api:5000/init")
+
+            if init_response.status_code != 200:
+                logging.error(f"Scraper initialization failed. Status code: {init_response.status_code}")
+                return {"message": "Failed to initialize scraper."}, 500
+
+            logging.info("Scraper initialized successfully.")
+            return {"message": "No books found. Scraper initialized."}, 200
+
+        except Exception as e:
+            logging.error(f"Unexpected error during scraping: {e}")
+            return {"message": "An unexpected error occurred"}, 500
 
 
 # Endpoints
@@ -135,6 +169,7 @@ api.add_resource(Init, "/init")
 api.add_resource(Headlines, "/headlines")
 api.add_resource(Books, "/books")
 api.add_resource(TaskStatus, "/status/<string:task_id>")
+api.add_resource(StartInitialBooksScrape, "/start-initial-books-scrape")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
