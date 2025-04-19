@@ -29,5 +29,17 @@ PrintAi Technical Project
 
 3. Access the chatbot interface in your browser at http://localhost:3000.
 
+## Tests
+**Tests runs automatically on docker container starts.**
+
+In case of desire of manually run the tests:
+
+With container runnin:
+- Backend tests
+```bash
+ docker exec -it source_code-api-1 pytest app/tests
+```
+
+
 
 

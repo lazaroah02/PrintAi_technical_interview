@@ -10,7 +10,7 @@ services:
     volumes:
       - ./backend:/app
     working_dir: /app
-    command: python app/main.py
+    command: sh -c "pytest app/tests; python app/main.py"
   
   init_scraper:
     image: curlimages/curl
@@ -60,4 +60,5 @@ services:
              n8n update:workflow --id=lcf2jg0YvyMyMTxJ --active=true &&
              n8n start
              "
+
 
