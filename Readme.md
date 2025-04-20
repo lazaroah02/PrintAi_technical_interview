@@ -27,6 +27,8 @@ PrintAi Technical Project
 - n8n interface accessible from : `http://localhost:5678`
 - API Accessible from: `http://localhost:5000`
 
+**BIG NOTE: IF THE LOCATION IS CUBA, THE MODEL DOESN'T WORK. USE VPN**
+
 3. Access the chatbot interface in your browser at http://localhost:3000.
 
 ## Tests
