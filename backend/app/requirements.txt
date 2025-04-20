@@ -10,3 +10,4 @@ flask-cors
 celery==5.5.1
 requests
 pytest
+flasgger

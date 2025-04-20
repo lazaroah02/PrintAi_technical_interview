@@ -42,6 +42,9 @@ With container runnin:
  docker exec -it source_code-api-1 pytest
 ```
 
+## API Documentation
+You can find Swagger API documentation on `http://localhost:5000/apidocs` 
+
 
 
 
