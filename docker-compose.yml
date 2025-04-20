@@ -17,11 +17,11 @@ services:
     depends_on:
       - api
     entrypoint: >
-      sh -c "sleep 10 && curl -X POST http://api:5000/start-initial-books-scrape"
+      sh -c "sleep 20 && curl -X POST http://api:5000/start-initial-books-scrape"
 
   worker:
     build:
-      context: ./backend
+      context: ./backend/app
       dockerfile: Dockerfile
     depends_on:
       - redis
