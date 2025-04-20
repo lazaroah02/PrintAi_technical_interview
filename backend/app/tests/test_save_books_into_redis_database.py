@@ -68,7 +68,7 @@ def test_save_books_into_redis_database_redis_connection_error(
 @patch("redis.Redis")
 @patch("app.redis_storage.logging.info")
 def test_save_books_into_redis_database_empty_books(
-        mock_logging_info, 
+        mock_logging_info,
         mock_redis
         ):
     # Call the function with an empty list

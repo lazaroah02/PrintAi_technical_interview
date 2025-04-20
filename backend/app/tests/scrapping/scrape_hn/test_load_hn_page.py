@@ -25,7 +25,8 @@ def test_load_hn_page_success(mock_webdriver, mock_sleep):
 
 
 # 2. Test ConnectionError when loading the page
-@patch("app.scraping.scrape_hn.webdriver.Chrome")  # Patch the Chrome constructor to avoid actual browser initialization
+# Patch the Chrome constructor to avoid actual browser initialization
+@patch("app.scraping.scrape_hn.webdriver.Chrome")
 @patch("app.scraping.scrape_hn.time.sleep")  # Patch sleep to prevent delay
 def test_load_hn_page_connection_error(mock_sleep, mock_webdriver):
     # Create a mock driver
@@ -36,8 +37,15 @@ def test_load_hn_page_connection_error(mock_sleep, mock_webdriver):
     mock_driver.get.side_effect = Exception("Connection error")
 
     # Call the function with page 1 and expect a ConnectionError
-    with pytest.raises(ConnectionError, match=r"Error reaching https://news\.ycombinator\.com/\?p=1\. Check the internet connection\."):
+    with pytest.raises(
+        ConnectionError,
+        match=(
+            r"Error reaching https://news\.ycombinator\.com/\?p=1\. "
+            r"Check the internet connection\."
+        )
+    ):
         load_hn_page(mock_driver, 1)
+
 
 # 3. Test that time.sleep is called after page load
 @patch("time.sleep")
