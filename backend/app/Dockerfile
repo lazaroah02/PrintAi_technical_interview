@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy project files
-COPY . /app
+COPY . .
 
 # Set the root directory for Python modules
 ENV PYTHONPATH=/app

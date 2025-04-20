@@ -29,7 +29,7 @@ class HelloWorld(Resource):
     def get(self):
         return {
             "mensaje": "Welcome!",
-            "routes": " /init, /status/<task_id>, /headlines, /books"
+            "routes": "/init, /status/<task_id>, /headlines, /books, /status/<string:task_id>, /start-initial-books-scrape",
         }
 
 

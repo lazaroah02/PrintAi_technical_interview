@@ -6,3 +6,4 @@ venv/
 dist/
 __pycache__/
 n8n_data
+.pytest_cache
