@@ -1,7 +1,5 @@
-# app/tests/conftest.py
 import sys
 import os
-
 
 sys.path.insert(
     0,
@@ -10,3 +8,6 @@ sys.path.insert(
         os.path.join(os.path.dirname(__file__), '../../')
     )
 )
+
+
+
