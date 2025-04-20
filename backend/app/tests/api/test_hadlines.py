@@ -2,17 +2,20 @@ import pytest
 from unittest.mock import patch
 from app.main import app
 
+
 @pytest.fixture
 def client():
     with app.test_client() as client:
         yield client
 
-# Mock con noticias realistas
+
+# News mock
 mock_news = [
     {"title": "Noticia 1", "url": "https://example.com/1", "score": 120},
     {"title": "Noticia 2", "url": "https://example.com/2", "score": 95},
     {"title": "Noticia 3", "url": "https://example.com/3", "score": 88},
 ]
+
 
 @patch('app.main.get_hackernews_top_stories')
 def test_headlines_success(mock_get_hn, client):
@@ -31,11 +34,13 @@ def test_headlines_success(mock_get_hn, client):
         assert "url" in story
         assert "score" in story
 
+
 @patch('app.main.get_hackernews_top_stories', side_effect=Exception("error"))
 def test_headlines_failure(mock_get_hn, client):
     response = client.get('/headlines')
     assert response.status_code == 500
     assert "Error getting the news" in response.get_json()["message"]
+
 
 @patch('app.main.get_hackernews_top_stories')
 def test_headlines_custom_page(mock_get_hn, client):

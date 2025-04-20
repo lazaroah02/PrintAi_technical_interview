@@ -37,7 +37,7 @@ In case of desire of manually run the tests:
 With container runnin:
 - Backend tests
 ```bash
- docker exec -it source_code-api-1 pytest app/tests
+ docker exec -it source_code-api-1 pytest
 ```
 
 

@@ -1,11 +1,13 @@
 from unittest.mock import patch, MagicMock
-from app.main import app 
+from app.main import app
 import pytest
+
 
 @pytest.fixture
 def client():
     with app.test_client() as client:
         yield client
+
 
 @patch('app.tasks.scrape_books_task.delay')
 def test_init_success(mock_scrape_task, client):
@@ -17,6 +19,7 @@ def test_init_success(mock_scrape_task, client):
     data = response.get_json()
     assert data["message"] == "Books Scraping Started!"
     assert data["task_id"] == "1234"
+
 
 @patch('app.tasks.scrape_books_task.delay', side_effect=Exception("error"))
 def test_init_failure(mock_scrape_task, client):

@@ -1,15 +1,17 @@
+import json
 import logging
+import os
+
+import redis
+import requests
+from dotenv import load_dotenv
 from flask import Flask, request
+from flask_cors import CORS
 from flask_restful import Api, Resource
-from app.tasks import scrape_books_task
+
 from app.loggin_config import setup_logging
 from app.scraping.scrape_hn import get_hackernews_top_stories
-import redis
-import json
-import os
-from dotenv import load_dotenv
-from flask_cors import CORS
-import requests
+from app.tasks import scrape_books_task
 
 # --- Config logging ---
 setup_logging("app")
@@ -20,63 +22,89 @@ load_dotenv()
 app = Flask(__name__)
 api = Api(app)
 
-#cors config
-CORS(app, resources={
-    r"/*": {"origins": "*"},
-})
+# CORS config
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 
 class HelloWorld(Resource):
     def get(self):
         return {
             "mensaje": "Welcome!",
-            "routes": "/init, /status/<task_id>, /headlines, /books, /status/<string:task_id>, /start-initial-books-scrape",
+            "routes": [
+                {
+                    "path": "/",
+                    "description": "Welcome endpoint with API information.",
+                },
+                {
+                    "path": "/init",
+                    "description": "Start the book scraping task.",
+                },
+                {
+                    "path": "/headlines",
+                    "description": (
+                        "Get Hacker News headlines with optional pagination."
+                    ),
+                },
+                {
+                    "path": "/books",
+                    "description": "Retrieve books information.",
+                },
+                {
+                    "path": "/status/<task_id>",
+                    "description": "Check the status of a specific task.",
+                },
+                {
+                    "path": "/start-initial-books-scrape",
+                    "description": (
+                        "Start the initial book scraping process."
+                    ),
+                },
+            ],
         }
 
 
 class Init(Resource):
     def post(self):
         try:
-            task = scrape_books_task.delay()    
+            task = scrape_books_task.delay()
             return {
                 "message": "Books Scraping Started!",
-                "task_id": task.id
+                "task_id": task.id,
             }
-        except:
+        except Exception:
             return {
-                "message":"Error starting the task!"
+                "message": "Error starting the task!",
             }, 500
 
 
 class Headlines(Resource):
     def get(self):
-        page = request.args.get('page', 1)
+        page = request.args.get("page", 1)
         try:
             stories = get_hackernews_top_stories(page)
             return {
                 "message": "Success!",
-                "data": stories
+                "data": stories,
             }
-        except:
+        except Exception:
             return {
-                "message":"Error getting the news"
+                "message": "Error getting the news",
             }, 500
+
 
 class Books(Resource):
     def get(self):
-        # Parámetros opcionales
-        page = int(request.args.get('page', 1))
-        limit = int(request.args.get('limit', 10))
-        search_value = request.args.get('search', "").lower()
-        category = request.args.get('category', "").lower()
+        page = int(request.args.get("page", 1))
+        limit = int(request.args.get("limit", 10))
+        search = request.args.get("search", "").lower()
+        category = request.args.get("category", "").lower()
 
         try:
-            # Redis connection
-            REDIS_HOST = os.getenv("REDIS_HOST", 'redis')
-            REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-            REDIS_DB = int(os.getenv("REDIS_DB", 0))
-            r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
-            
-            # get books keys
+            redis_host = os.getenv("REDIS_HOST", "redis")
+            redis_port = int(os.getenv("REDIS_PORT", 6379))
+            redis_db = int(os.getenv("REDIS_DB", 0))
+            r = redis.Redis(host=redis_host, port=redis_port, db=redis_db)
+
             keys = r.keys("book:*")
             books = []
 
@@ -85,37 +113,35 @@ class Books(Resource):
                 if data:
                     book = json.loads(data)
 
-                    # Search by title and or category
-                    if search_value and search_value not in book['title'].lower():
+                    if search and search not in book["title"].lower():
                         continue
-                    if category and category not in book['category'].lower():
+                    if category and category not in book["category"].lower():
                         continue
 
                     books.append(book)
 
-            # Pagination
             start = (page - 1) * limit
             end = start + limit
             paginated_books = books[start:end]
-            
+
             return {
                 "message": "Success",
                 "total_books": len(books),
                 "page": page,
                 "page_size": limit,
-                "data": paginated_books
+                "data": paginated_books,
             }
 
-        except Exception as e:
+        except Exception:
             return {
                 "message": "Error retrieving books from Redis",
             }, 500
 
 
-
 class TaskStatus(Resource):
     def get(self, task_id):
         from app.tasks import celery
+
         task = celery.AsyncResult(task_id)
         result = task.result
 
@@ -125,34 +151,44 @@ class TaskStatus(Resource):
         return {
             "task_id": task.id,
             "status": task.status,
-            "result": result
+            "result": result,
         }
+
 
 class StartInitialBooksScrape(Resource):
     def post(self):
         try:
             logging.info("Fetching current books from /books endpoint...")
-            response = requests.get("http://api:5000/books")  
+            response = requests.get("http://api:5000/books")
 
             if response.status_code != 200:
-                logging.error(f"Failed to fetch books. Status code: {response.status_code}")
+                logging.error(
+                    "Failed to fetch books. "
+                    f"Status code: {response.status_code}"
+                )
                 return {"message": "Failed to fetch books"}, 500
 
             data = response.json()
             total_books = data.get("total_books", 0)
             logging.info(f"Total books found: {total_books}")
 
-            # If books exist, skip initialization
             if total_books > 0:
                 logging.info("Books already present. Skipping initial scrape.")
-                return {"message": f"{total_books} books already present. Skipping scraper."}, 200
+                return {
+                    "message": (
+                        f"{total_books} books already present. "
+                        "Skipping scraper."
+                    )
+                }, 200
 
-            # If no books, trigger the scraper
             logging.info("No books found. Triggering scraper via /init...")
             init_response = requests.post("http://api:5000/init")
 
             if init_response.status_code != 200:
-                logging.error(f"Scraper initialization failed. Status code: {init_response.status_code}")
+                logging.error(
+                    "Scraper initialization failed. "
+                    f"Status code: {init_response.status_code}"
+                )
                 return {"message": "Failed to initialize scraper."}, 500
 
             logging.info("Scraper initialized successfully.")
@@ -173,4 +209,3 @@ api.add_resource(StartInitialBooksScrape, "/start-initial-books-scrape")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-

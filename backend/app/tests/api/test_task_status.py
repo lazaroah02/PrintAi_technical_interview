@@ -1,11 +1,13 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from app.main import app 
+from app.main import app
+
 
 @pytest.fixture
 def client():
     with app.test_client() as client:
         yield client
+
 
 @patch('app.tasks.celery.AsyncResult')
 def test_task_status(mock_async_result, client):
@@ -20,5 +22,3 @@ def test_task_status(mock_async_result, client):
     data = response.get_json()
     assert data["status"] == "SUCCESS"
     assert data["result"] == {"done": True}
-
-
