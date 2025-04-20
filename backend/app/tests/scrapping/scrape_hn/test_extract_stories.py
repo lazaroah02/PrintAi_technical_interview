@@ -35,14 +35,14 @@ def test_extract_stories_success(mock_chrome):
     # Mock the return values for elements
     example_url1 = "https://example.com/story1"
     example_url2 = "https://example.com/story2"
-    items[0].find_element.return_value.text = "Story Title 1"
-    items
-    [0].find_element.return_value.get_attribute.return_value = example_url1
+    return_value1 = items[0].find_element.return_value
+    return_value1.text = "Story Title 1"
+    return_value1.get_attribute.return_value = example_url1
     subtexts[0].find_element.return_value.text = "100 points"
 
-    items[1].find_element.return_value.text = "Story Title 2"
-    items
-    [1].find_element.return_value.get_attribute.return_value = example_url2
+    return_value2 = items[1].find_element.return_value
+    return_value2.text = "Story Title 2"
+    return_value2.get_attribute.return_value = example_url2
     subtexts[1].find_element.return_value.text = "200 points"
 
     # Mock `find_elements` on the driver to return both items and subtexts
@@ -101,8 +101,7 @@ def test_extract_stories_invalid_score(mock_find_elements):
     # Prepare mock elements with invalid score format (e.g., no number)
     items[0].find_element.return_value.text = "Story Title 1"
     example_url = "https://example.com/story1"
-    items
-    [0].find_element.return_value.get_attribute.return_value = example_url
+    items[0].find_element.return_value.get_attribute.return_value = example_url
     subtexts[0].find_element.return_value.text = "Invalid score format"
 
     # Mock both items and subtexts
