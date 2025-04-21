@@ -16,8 +16,13 @@ def test_scrape_books_success(
     mock_chrome.return_value = mock_driver
     mock_get_catalog.return_value = "soup"
     mock_extract.side_effect = [
-        [{"title": "Book 1"}, {"title": "Book 2"}],
-        [{"title": "Book 3"}],
+        [
+            {"title": "Book 1", "url": "url1", "price": "10.99", "category": "Fiction", "image_url": None},
+            {"title": "Book 2", "url": "url2", "price": "12.99", "category": "Fiction", "image_url": None}
+        ],
+        [
+            {"title": "Book 3", "url": "url3", "price": "15.99", "category": "Sci-Fi", "image_url": None}
+        ],
         []
     ]
 
@@ -25,7 +30,11 @@ def test_scrape_books_success(
 
     assert mock_extract.call_count == 2  # Two calls until limit is reached
     mock_save.assert_called_once_with(
-        [{"title": "Book 1"}, {"title": "Book 2"}, {"title": "Book 3"}]
+        [
+            {"title": "Book 1", "url": "url1", "price": "10.99", "category": "Fiction", "image_url": None},
+            {"title": "Book 2", "url": "url2", "price": "12.99", "category": "Fiction", "image_url": None},
+            {"title": "Book 3", "url": "url3", "price": "15.99", "category": "Sci-Fi", "image_url": None}
+        ]
     )
     mock_driver.quit.assert_called_once()
 

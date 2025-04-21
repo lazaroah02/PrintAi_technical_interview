@@ -19,7 +19,8 @@ dependencies = [
     "celery (==5.5.1)",
     "requests (>=2.32.3,<3.0.0)",
     "pytest (>=8.3.5,<9.0.0)",
-    "flasgger (>=0.9.7.1,<0.10.0.0)"
+    "flasgger (>=0.9.7.1,<0.10.0.0)",
+    "pydantic (>=2.11.3,<3.0.0)"
 ]
 
 [build-system]

@@ -11,6 +11,7 @@ from selenium.common.exceptions import (
 
 from app.loggin_config import setup_logging
 from app.utils import build_chrome_options, retry
+from app.models import HNStory, HNStoriesResponse
 
 
 # --- Constants ---
@@ -28,7 +29,7 @@ def load_hn_page(driver, page: int) -> None:
         )
 
 
-def extract_stories(driver) -> List[Dict]:
+def extract_stories(driver) -> HNStoriesResponse:
     stories = []
     items = driver.find_elements(By.CSS_SELECTOR, "tr.athing")
     subtexts = driver.find_elements(By.CSS_SELECTOR, "td.subtext")
@@ -46,18 +47,14 @@ def extract_stories(driver) -> List[Dict]:
             )
             score = int(score_elem.text.split()[0])
 
-            stories.append({
-                "title": title,
-                "url": url,
-                "score": score
-            })
+            stories.append(HNStory(title=title, url=url, score=score))
         except (NoSuchElementException, IndexError):
             logging.debug(
                 f"Skipping item {i} due to missing elements."
             )
             continue
 
-    return stories
+    return HNStoriesResponse(stories=stories, total=len(stories))
 
 
 def go_to_next_page(driver) -> bool:
@@ -73,7 +70,7 @@ def go_to_next_page(driver) -> bool:
 
 # --- Main Scraper Function ---
 @retry(max_attempts=3)
-def get_hackernews_top_stories(page: int = 1) -> List[Dict]:
+def get_hackernews_top_stories(page: int = 1) -> HNStoriesResponse:
     logging.info("Starting Hacker News Scraping ...")
     driver = None
 
@@ -109,11 +106,11 @@ if __name__ == "__main__":
     setup_logging("scrape_hn")
 
     try:
-        top_stories = get_hackernews_top_stories()
-        for story in top_stories[:10]:
+        top_stories_response = get_hackernews_top_stories()
+        for story in top_stories_response.stories[:10]:
             print(
-                f"Score: {story['score']} | "
-                f"{story['title']} | {story['url']}"
+                f"Score: {story.score} | "
+                f"{story.title} | {story.url}"
             )
     except Exception as e:
         logging.critical(f"Script failed entirely: {e}")

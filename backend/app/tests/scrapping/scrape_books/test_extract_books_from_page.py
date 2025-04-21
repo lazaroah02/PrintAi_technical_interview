@@ -60,10 +60,10 @@ def test_extract_books_from_page_success():
     books = extract_books_from_page(soup, mock_driver, 1)
 
     assert len(books) == 1
-    assert books[0]["title"] == "Book Title"
-    assert books[0]["price"] == "15.99"
-    assert books[0]["category"] == "Sci-Fi"
-    assert books[0]["image_url"] == "https://books.toscrape.com/img/book.jpg"
+    assert books[0].title == "Book Title"
+    assert books[0].price == "15.99"
+    assert books[0].category == "Sci-Fi"
+    assert books[0].image_url == "https://books.toscrape.com/img/book.jpg"
 
 
 # Test 2: Ensure books with price > 20 are skipped
@@ -76,7 +76,7 @@ def test_extract_books_from_page_price_filter():
     books = extract_books_from_page(soup, mock_driver, 2)
 
     assert len(books) == 1
-    assert books[0]["title"] == "Book Title"
+    assert books[0].title == "Book Title"
 
 
 # Test 3: Handling missing elements or invalid structure
@@ -139,7 +139,7 @@ def test_extract_books_from_page_remaining_limit():
     books = extract_books_from_page(soup, mock_driver, 1)
 
     assert len(books) == 1
-    assert books[0]["title"] == "Book Title"
+    assert books[0].title == "Book Title"
 
 
 # Test 6: Handle empty catalog page (no books)

@@ -10,6 +10,7 @@ from selenium.common.exceptions import TimeoutException
 from app.utils import retry, build_chrome_options
 from app.redis_storage import save_books_into_redis_database
 from app.loggin_config import setup_logging
+from app.models import ScrapedBook, ScrapingResult
 
 
 # --- Constants ---
@@ -35,7 +36,7 @@ def get_catalog_page(driver, page: int) -> BeautifulSoup:
 
 def extract_books_from_page(
     soup: BeautifulSoup, driver, remaining: int
-) -> List[Dict]:
+) -> List[ScrapedBook]:
     books = []
     articles = soup.select("article.product_pod")
 
@@ -62,13 +63,14 @@ def extract_books_from_page(
             )['src']
             cover_url = IMAGE_BASE_URL + img_relative_url.replace("../", "")
 
-            books.append({
-                "url": book_url,
-                "title": title,
-                "price": price_str,
-                "category": category,
-                "image_url": cover_url
-            })
+            book = ScrapedBook(
+                url=book_url,
+                title=title,
+                price=price_str,
+                category=category,
+                image_url=cover_url
+            )
+            books.append(book)
 
             if len(books) >= remaining:
                 break
@@ -110,7 +112,11 @@ def scrape_books(limit: int = 100) -> None:
         logging.info(
             f"Scraping complete. Total books collected: {len(all_books)}"
         )
-        save_books_into_redis_database(all_books)
+        result = ScrapingResult(
+            total_books=len(all_books),
+            books=all_books
+        )
+        save_books_into_redis_database([book.model_dump() for book in result.books])
 
     except Exception as e:
         logging.error(f"Unexpected error during scraping: {e}")

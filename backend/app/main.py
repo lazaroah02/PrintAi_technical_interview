@@ -13,6 +13,7 @@ from flasgger import Swagger
 from app.loggin_config import setup_logging
 from app.scraping.scrape_hn import get_hackernews_top_stories
 from app.tasks import scrape_books_task
+from app.models import Book, PaginatedBooksResponse, HackerNewsResponse, HackerNewsStory
 
 # --- Config logging ---
 setup_logging("app")
@@ -149,10 +150,11 @@ class Headlines(Resource):
         page = request.args.get("page", 1)
         try:
             stories = get_hackernews_top_stories(page)
-            return {
-                "message": "Success!",
-                "data": stories,
-            }
+            response = HackerNewsResponse(
+                message="Success!",
+                data=[HackerNewsStory(**story) for story in stories]
+            )
+            return response.model_dump()  # Actualizado a model_dump()
         except Exception:
             return {
                 "message": "Error getting the news",
@@ -253,14 +255,14 @@ class Books(Resource):
             start = (page - 1) * limit
             end = start + limit
             paginated_books = books[start:end]
-
-            return {
-                "message": "Success",
-                "total_books": len(books),
-                "page": page,
-                "page_size": limit,
-                "data": paginated_books,
-            }
+            response = PaginatedBooksResponse(
+                message="Success",
+                total_books=len(books),
+                page=page,
+                page_size=limit,
+                data=paginated_books
+            )
+            return response.model_dump()  # Actualizado a model_dump()
 
         except Exception:
             return {

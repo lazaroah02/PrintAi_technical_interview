@@ -51,16 +51,16 @@ def test_extract_stories_success(mock_chrome):
 
     # Patch the driver object and call extract_stories
     mock_chrome.return_value = mock_driver
-    stories = extract_stories(mock_driver)
+    response = extract_stories(mock_driver)
 
     # Ensure stories are extracted correctly
-    assert len(stories) == 2
-    assert stories[0]['title'] == "Story Title 1"
-    assert stories[0]['url'] == "https://example.com/story1"
-    assert stories[0]['score'] == 100
-    assert stories[1]['title'] == "Story Title 2"
-    assert stories[1]['url'] == "https://example.com/story2"
-    assert stories[1]['score'] == 200
+    assert response.total == 2
+    assert response.stories[0].title == "Story Title 1"
+    assert str(response.stories[0].url) == "https://example.com/story1"  # Convert HttpUrl to string
+    assert response.stories[0].score == 100
+    assert response.stories[1].title == "Story Title 2"
+    assert str(response.stories[1].url) == "https://example.com/story2"  # Convert HttpUrl to string
+    assert response.stories[1].score == 200
 
 
 # 2. Test Missing Elements (e.g., No Title or Score)
@@ -78,8 +78,8 @@ def test_extract_stories_missing_elements(mock_find_elements):
     mock_find_elements.return_value = items + subtexts
 
     # Call the function and check that no story is extracted
-    stories = extract_stories(mock_find_elements)
-    assert len(stories) == 0
+    response = extract_stories(mock_find_elements)
+    assert response.total == 0
 
 
 # 3. Test Empty Page
@@ -89,10 +89,10 @@ def test_extract_stories_empty_page(mock_find_elements):
     mock_find_elements.return_value = []
 
     # Call the function with an empty page
-    stories = extract_stories(mock_find_elements)
+    response = extract_stories(mock_find_elements)
 
     # Ensure no stories are returned
-    assert len(stories) == 0
+    assert response.total == 0
 
 
 # 4. Test Invalid Score Format
@@ -108,7 +108,7 @@ def test_extract_stories_invalid_score(mock_find_elements):
     mock_find_elements.return_value = items + subtexts
 
     # Call the function and check if it handles the invalid score gracefully
-    stories = extract_stories(mock_find_elements)
+    response = extract_stories(mock_find_elements)
 
     # Ensure that the story is not included due to invalid score
-    assert len(stories) == 0
+    assert response.total == 0
