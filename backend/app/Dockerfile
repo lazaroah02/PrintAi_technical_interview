@@ -13,21 +13,30 @@ RUN apt-get update && apt-get install -y \
     chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
+# Install Poetry
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Add Poetry to PATH
+ENV PATH="/root/.local/bin:$PATH"
+
+# Disable Poetry virtualenvs
+ENV POETRY_VIRTUALENVS_CREATE=false
+
 # Create working directory
 WORKDIR /app
 
 # Copy project files
 COPY . .
 
-# Set the root directory for Python modules
+# Set Python module path
 ENV PYTHONPATH=/app
 
-# Install Python dependencies
-RUN pip install -r requirements.txt
+# Install only main dependencies (no dev)
+RUN poetry install --only main
 
-# Environment variables for Selenium
+# Selenium env
 ENV CHROME_BIN=/usr/bin/chromium
 ENV PATH=$PATH:/usr/bin/chromium
 
-# Default command (overwritten with docker-compose)
+# Default command
 CMD ["python", "app/main.py"]
