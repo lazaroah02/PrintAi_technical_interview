@@ -3,9 +3,9 @@ from typing import Optional, List
 
 
 class Book(BaseModel):
-    title: str = Field(..., max_length=100)
+    title: str
     price: float = Field(..., ge=0)
-    category: str = Field(..., max_length=50)
+    category: str
     url: str
     image_url: Optional[str] = None
 
@@ -31,9 +31,9 @@ class HackerNewsResponse(BaseModel):
 
 class ScrapedBook(BaseModel):
     url: str
-    title: str = Field(..., max_length=100)
+    title: str
     price: str
-    category: str = Field(..., max_length=50)
+    category: str
     image_url: Optional[str] = None
 
 

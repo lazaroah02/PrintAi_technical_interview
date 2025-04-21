@@ -264,7 +264,8 @@ class Books(Resource):
             )
             return response.model_dump()  # Actualizado a model_dump()
 
-        except Exception:
+        except Exception as e:
+            logging.error(f"Error retrieving books from Redis: {e}")
             return {
                 "message": "Error retrieving books from Redis",
             }, 500
