@@ -1,7 +1,10 @@
+import { CHATBOT_API_URL } from "@/settings";
+
 export function sendMessage(message: string) {
   const options = { method: "POST", body: "false" };
+  console.log(`${CHATBOT_API_URL}?chatInput=${message}`)
   return fetch(
-    `http://localhost:5678/webhook/ask?chatInput=${message}`,
+    `${CHATBOT_API_URL}?chatInput=${message}`,
     options
   )
     .then((response) => {

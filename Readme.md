@@ -31,6 +31,8 @@ PrintAi Technical Project
 
 3. Access the chatbot interface in your browser at http://localhost:3000.
 
+Note: To access out of the local computer to the app, change the current value of: VITE_BACKEND_URL=http://localhost:5678 in the .env file of the frontend/chatbot-ui folder for the ip of the computer that is running the services.
+
 ## Tests
 **Tests runs automatically on docker container starts.**
 
