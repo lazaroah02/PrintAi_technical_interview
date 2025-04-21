@@ -56,8 +56,6 @@ services:
       - 5678:5678
     depends_on:
       - api
-    volumes:
-      - ./workflows/n8n_data:/home/node/.n8n
     env_file:
       - ./workflows/.env
     entrypoint: >
