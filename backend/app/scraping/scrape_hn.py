@@ -1,6 +1,5 @@
 import time
 import logging
-from typing import List, Dict
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -22,10 +21,10 @@ def load_hn_page(driver, page: int) -> None:
     try:
         driver.get(BASE_URL.format(page))
         time.sleep(2)
-    except Exception:
+    except Exception as e:
         raise ConnectionError(
-            f"Error reaching {BASE_URL.format(page)}. "
-            "Check the internet connection."
+            f"Error reaching {BASE_URL.format(page)}. {e}"
+            "Check the internet connection or DNS configuration."
         )
 
 

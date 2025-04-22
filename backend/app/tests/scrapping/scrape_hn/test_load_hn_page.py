@@ -40,9 +40,10 @@ def test_load_hn_page_connection_error(mock_sleep, mock_webdriver):
     with pytest.raises(
         ConnectionError,
         match=(
-            r"Error reaching https://news\.ycombinator\.com/\?p=1\. "
-            r"Check the internet connection\."
+            r"Error reaching https://news\.ycombinator\.com/\?p=1\. Connection error\s?"
+            r"Check the internet connection or DNS configuration\."
         )
+
     ):
         load_hn_page(mock_driver, 1)
 

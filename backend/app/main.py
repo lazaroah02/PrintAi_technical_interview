@@ -155,7 +155,8 @@ class Headlines(Resource):
                 data=[HackerNewsStory(**story) for story in stories]
             )
             return response.model_dump()  # Actualizado a model_dump()
-        except Exception:
+        except Exception as e:
+            logging.error(f"Error getting the news {e}")
             return {
                 "message": "Error getting the news",
             }, 500
