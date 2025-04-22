@@ -20,11 +20,9 @@ def get_hackernews_top_stories(page=1):
     options.add_argument("--window-size=1920,1080")
 
     BASE_URL = "https://news.ycombinator.com/?p={}"
-
     driver = None
 
     try:
-
         # Using webdriver-manager to manage automatically chromedriver
         driver = webdriver.Chrome(options=options)
 
@@ -44,11 +42,13 @@ def get_hackernews_top_stories(page=1):
         for i in range(len(items)):
             try:
                 title_elem = items[i].find_element(
-                    By.CSS_SELECTOR, 'span.titleline a')
+                    By.CSS_SELECTOR, 'span.titleline a'
+                )
                 title = title_elem.text
                 url = title_elem.get_attribute('href')
                 score_elem = subtexts[i].find_element(
-                    By.CSS_SELECTOR, 'span.score')
+                    By.CSS_SELECTOR, 'span.score'
+                )
                 score = int(score_elem.text.split()[0])
             except (NoSuchElementException, IndexError):
                 logging.debug(f"Skipping item {i} due to missing elements.")
@@ -68,12 +68,15 @@ def get_hackernews_top_stories(page=1):
             logging.info("No more pages to scrape.")
 
         return stories
+
     except WebDriverException as e:
         logging.critical(f"Failed to start WebDriver: {e}")
         raise
     except ConnectionError:
         raise ConnectionError(
-            f"Connection Error: Error reaching {BASE_URL.format(page)}. Check the internet connection")
+            f"Connection Error: Error reaching {BASE_URL.format(page)}. "
+            "Check the internet connection"
+        )
     except Exception as e:
         logging.error(f"Unexpected error during scraping: {e}")
         raise
@@ -93,6 +96,8 @@ if __name__ == "__main__":
         top_stories = get_hackernews_top_stories()
         for story in top_stories[:10]:
             print(
-                f"Score: {story['score']} | {story['title']} | {story['url']}")
+                f"Score: {story['score']} | {story['title']} | "
+                f"{story['url']}"
+            )
     except Exception as e:
         logging.critical(f"Script failed entirely: {e}")
