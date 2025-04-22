@@ -64,7 +64,7 @@ def extract_books_from_page(
             cover_url = IMAGE_BASE_URL + img_relative_url.replace("../", "")
 
             book = ScrapedBook(
-                url=book_url,
+                url=full_url,
                 title=title,
                 price=price_str,
                 category=category,
