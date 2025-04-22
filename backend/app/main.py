@@ -13,7 +13,7 @@ from flasgger import Swagger
 from app.loggin_config import setup_logging
 from app.scraping.scrape_hn import get_hackernews_top_stories
 from app.tasks import scrape_books_task
-from app.models import Book, PaginatedBooksResponse, HackerNewsResponse, HackerNewsStory
+from app.models import  PaginatedBooksResponse, HackerNewsResponse, HackerNewsStory
 
 # --- Config logging ---
 setup_logging("app")

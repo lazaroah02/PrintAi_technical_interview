@@ -1,115 +1,98 @@
-import time
 import logging
-
+import time
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import (
-    NoSuchElementException,
-    WebDriverException
-)
-
+from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from app.loggin_config import setup_logging
-from app.utils import build_chrome_options, retry
-from app.models import HNStory, HNStoriesResponse
+from app.utils import retry
 
+# ------------------- Main Scraper Function -------------------
 
-# --- Constants ---
-BASE_URL = "https://news.ycombinator.com/?p={}"
-
-
-def load_hn_page(driver, page: int) -> None:
-    try:
-        driver.get(BASE_URL.format(page))
-        time.sleep(2)
-    except Exception as e:
-        raise ConnectionError(
-            f"Error reaching {BASE_URL.format(page)}. {e}"
-            "Check the internet connection or DNS configuration."
-        )
-
-
-def extract_stories(driver) -> HNStoriesResponse:
-    stories = []
-    items = driver.find_elements(By.CSS_SELECTOR, "tr.athing")
-    subtexts = driver.find_elements(By.CSS_SELECTOR, "td.subtext")
-
-    for i in range(len(items)):
-        try:
-            title_elem = items[i].find_element(
-                By.CSS_SELECTOR, "span.titleline a"
-            )
-            title = title_elem.text
-            url = title_elem.get_attribute("href")
-
-            score_elem = subtexts[i].find_element(
-                By.CSS_SELECTOR, "span.score"
-            )
-            score = int(score_elem.text.split()[0])
-
-            stories.append(HNStory(title=title, url=url, score=score))
-        except (NoSuchElementException, IndexError):
-            logging.debug(
-                f"Skipping item {i} due to missing elements."
-            )
-            continue
-
-    return HNStoriesResponse(stories=stories, total=len(stories))
-
-
-def go_to_next_page(driver) -> bool:
-    try:
-        more_link = driver.find_element(By.LINK_TEXT, "More")
-        more_link.click()
-        time.sleep(2)
-        return True
-    except NoSuchElementException:
-        logging.info("No more pages to scrape.")
-        return False
-
-
-# --- Main Scraper Function ---
 @retry(max_attempts=3)
-def get_hackernews_top_stories(page: int = 1) -> HNStoriesResponse:
-    logging.info("Starting Hacker News Scraping ...")
+def get_hackernews_top_stories(page=1):
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+
+
+    BASE_URL = "https://news.ycombinator.com/?p={}"
+
     driver = None
 
     try:
-        options = build_chrome_options()
+
+        # Using webdriver-manager to manage automatically chromedriver
         driver = webdriver.Chrome(options=options)
 
-        load_hn_page(driver, page)
-        stories = extract_stories(driver)
+        logging.info("Starting Hacker News Scraping ...")
 
-        # Optionally go to next page (can be extended later)
-        go_to_next_page(driver)
+        try:
+            driver.get(BASE_URL.format(page))
+        except Exception:
+            raise ConnectionError()
+
+        time.sleep(2)
+
+        stories = []
+        items = driver.find_elements(By.CSS_SELECTOR, 'tr.athing')
+        subtexts = driver.find_elements(By.CSS_SELECTOR, 'td.subtext')
+
+        for i in range(len(items)):
+            try:
+                title_elem = items[i].find_element(
+                    By.CSS_SELECTOR, 'span.titleline a')
+                title = title_elem.text
+                url = title_elem.get_attribute('href')
+                score_elem = subtexts[i].find_element(
+                    By.CSS_SELECTOR, 'span.score')
+                score = int(score_elem.text.split()[0])
+            except (NoSuchElementException, IndexError):
+                logging.debug(f"Skipping item {i} due to missing elements.")
+                continue
+
+            stories.append({
+                "title": title,
+                "url": url,
+                "score": score
+            })
+
+        try:
+            more_link = driver.find_element(By.LINK_TEXT, "More")
+            more_link.click()
+            time.sleep(2)
+        except NoSuchElementException:
+            logging.info("No more pages to scrape.")
 
         return stories
-
     except WebDriverException as e:
-        logging.critical(f"WebDriver error: {e}")
+        logging.critical(f"Failed to start WebDriver: {e}")
         raise
-    except ConnectionError as e:
-        logging.error(str(e))
-        raise
+    except ConnectionError:
+        raise ConnectionError(
+            f"Connection Error: Error reaching {BASE_URL.format(page)}. Check the internet connection")
     except Exception as e:
-        logging.error(f"Unexpected error: {e}")
+        logging.error(f"Unexpected error during scraping: {e}")
         raise
+
     finally:
         if driver:
             driver.quit()
             logging.info("Scraping finished and browser closed.")
 
 
-# --- Entry Point ---
+# ------------------- Execution -------------------
+
+
 if __name__ == "__main__":
     setup_logging("scrape_hn")
-
     try:
-        top_stories_response = get_hackernews_top_stories()
-        for story in top_stories_response.stories[:10]:
+        top_stories = get_hackernews_top_stories()
+        for story in top_stories[:10]:
             print(
-                f"Score: {story.score} | "
-                f"{story.title} | {story.url}"
-            )
+                f"Score: {story['score']} | {story['title']} | {story['url']}")
     except Exception as e:
         logging.critical(f"Script failed entirely: {e}")
