@@ -1,6 +1,6 @@
 import time
 import logging
-from typing import List, Dict
+from typing import List
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -116,7 +116,9 @@ def scrape_books(limit: int = 100) -> None:
             total_books=len(all_books),
             books=all_books
         )
-        save_books_into_redis_database([book.model_dump() for book in result.books])
+        save_books_into_redis_database(
+            [book.model_dump() for book in result.books]
+            )
 
     except Exception as e:
         logging.error(f"Unexpected error during scraping: {e}")

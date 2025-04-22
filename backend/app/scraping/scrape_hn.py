@@ -3,12 +3,13 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException, WebDriverException
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import WebDriverException
 from app.loggin_config import setup_logging
 from app.utils import retry
 
-# ------------------- Main Scraper Function -------------------
 
+# ------------------- Main Scraper Function -------------------
 @retry(max_attempts=3)
 def get_hackernews_top_stories(page=1):
     options = Options()
@@ -17,7 +18,6 @@ def get_hackernews_top_stories(page=1):
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
-
 
     BASE_URL = "https://news.ycombinator.com/?p={}"
 

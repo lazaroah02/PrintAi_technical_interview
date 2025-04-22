@@ -13,7 +13,9 @@ from flasgger import Swagger
 from app.loggin_config import setup_logging
 from app.scraping.scrape_hn import get_hackernews_top_stories
 from app.tasks import scrape_books_task
-from app.models import  PaginatedBooksResponse, HackerNewsResponse, HackerNewsStory
+from app.models import PaginatedBooksResponse
+from app.models import HackerNewsResponse
+from app.models import HackerNewsStory
 
 # --- Config logging ---
 setup_logging("app")
@@ -38,7 +40,8 @@ class HelloWorld(Resource):
         ---
         responses:
           200:
-            description: Returns a welcome message and the available routes in the API
+            description:
+            Returns a welcome message and the available routes in the API
             schema:
               type: object
               properties:
@@ -58,13 +61,34 @@ class HelloWorld(Resource):
         return {
             "mensaje": "Welcome!",
             "routes": [
-                {"path": "/", "description": "Welcome endpoint with API information."},
-                {"path": "/init", "description": "Start the book scraping task."},
-                {"path": "/headlines", "description": "Get Hacker News headlines with optional pagination."},
-                {"path": "/books", "description": "Retrieve books information."},
-                {"path": "/status/<task_id>", "description": "Check the status of a specific task."},
-                {"path": "/start-initial-books-scrape", "description": "Start the initial book scraping process."},
-                {"path": "/apidocs", "description": "API documentation."},
+                {
+                  "path": "/",
+                  "description": "Welcome endpoint with API information."
+                  },
+                {
+                  "path": "/init",
+                  "description": "Start the book scraping task."
+                  },
+                {
+                  "path": "/headlines",
+                  "description": "Get HN headlines with optional pagination."
+                  },
+                {
+                  "path": "/books",
+                  "description": "Retrieve books information."
+                  },
+                {
+                  "path": "/status/<task_id>",
+                  "description": "Check the status of a specific task."
+                  },
+                {
+                  "path": "/start-initial-books-scrape",
+                  "description": "Start the initial book scraping process."
+                  },
+                {
+                  "path": "/apidocs",
+                  "description": "API documentation."
+                  },
             ]
         }
 

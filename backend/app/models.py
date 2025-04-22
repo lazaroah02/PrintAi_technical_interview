@@ -47,6 +47,7 @@ class HNStory(BaseModel):
     url: HttpUrl
     score: int
 
+
 class HNStoriesResponse(BaseModel):
     stories: List[HNStory]
     total: int
