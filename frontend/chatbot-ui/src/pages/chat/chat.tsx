@@ -1,7 +1,7 @@
 import { ChatInput } from "@/components/custom/chatinput";
 import { PreviewMessage, ThinkingMessage } from "../../components/custom/message";
 import { useScrollToBottom } from '@/components/custom/use-scroll-to-bottom';
-import { useState} from "react";
+import { useState, useRef} from "react";
 import { message } from "../../interfaces/interfaces"
 import { Overview } from "@/components/custom/overview";
 import { Header } from "@/components/custom/header";
@@ -13,6 +13,7 @@ export function Chat() {
   const [messages, setMessages] = useState<message[]>([]);
   const [question, setQuestion] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const sessionIdRef = useRef<string>(uuidv4());
 
   async function handleSubmit(text?: string) {
     const messageText = text || question;
@@ -23,7 +24,7 @@ export function Chat() {
     setQuestion("");
   
     try {
-      const output = await sendMessage(messageText); // <- Espera el resultado
+      const output = await sendMessage(messageText, sessionIdRef.current); // <- Espera el resultado
   
       const assistantMessage = {
         content: output,

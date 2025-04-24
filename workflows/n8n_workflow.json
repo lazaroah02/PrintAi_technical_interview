@@ -1,220 +1,248 @@
-[
+{
+  "name": "My workflow",
+  "nodes": [
     {
-        "createdAt": "2025-04-17T12:12:18.613Z",
-        "updatedAt": "2025-04-17T12:13:55.000Z",
-        "id": "lcf2jg0YvyMyMTxJ",
-        "name": "My workflow",
-        "active": true,
-        "nodes": [
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ask",
+        "responseMode": "lastNode",
+        "options": {
+          "responseContentType": "JSON"
+        }
+      },
+      "id": "11ae0a37-ace0-4500-882d-03a117ede4a3",
+      "name": "Webhook /ask",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        0
+      ],
+      "webhookId": "f0d17553-2f7e-408a-a69b-a111c6451098"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
             {
-                "parameters": {
-                    "httpMethod": "POST",
-                    "path": "ask",
-                    "responseMode": "lastNode",
-                    "options": {
-                        "responseContentType": "JSON"
-                    }
-                },
-                "id": "11ae0a37-ace0-4500-882d-03a117ede4a3",
-                "name": "Webhook /ask",
-                "type": "n8n-nodes-base.webhook",
-                "typeVersion": 1,
-                "position": [
-                    -100,
-                    0
-                ],
-                "webhookId": "f0d17553-2f7e-408a-a69b-a111c6451098"
+              "id": "2e07a487-8e7d-4117-90f7-ea9c7d56aa85",
+              "name": "query.chatInput",
+              "value": "={{ $json.query.chatInput }}",
+              "type": "string"
             },
             {
-                "parameters": {
-                    "assignments": {
-                        "assignments": [
-                            {
-                                "id": "2e07a487-8e7d-4117-90f7-ea9c7d56aa85",
-                                "name": "query.chatInput",
-                                "value": "={{ $json.query.chatInput }}",
-                                "type": "string"
-                            }
-                        ]
-                    },
-                    "options": {}
-                },
-                "type": "n8n-nodes-base.set",
-                "typeVersion": 3.4,
-                "position": [
-                    200,
-                    0
-                ],
-                "id": "58a6391c-7a43-4141-8511-bec3cd666b2b",
-                "name": "Edit Fields"
-            },
-            {
-                "parameters": {
-                    "respondWith": "allIncomingItems",
-                    "options": {
-                        "responseCode": 200
-                    }
-                },
-                "type": "n8n-nodes-base.respondToWebhook",
-                "typeVersion": 1.1,
-                "position": [
-                    800,
-                    0
-                ],
-                "id": "9a3a86bd-3172-4b24-a9ab-51e7347a61dc",
-                "name": "Respond to Webhook"
-            },
-            {
-                "parameters": {
-                    "promptType": "define",
-                    "text": "={{ $json.query.chatInput }}",
-                    "options": {}
-                },
-                "type": "@n8n/n8n-nodes-langchain.agent",
-                "typeVersion": 1.8,
-                "position": [
-                    420,
-                    0
-                ],
-                "id": "38a4cea3-9bbc-4899-a0b1-02f75e06d131",
-                "name": "AI Agent"
-            },
-            {
-                "parameters": {
-                    "toolDescription": "Get the top news of Hacker News",
-                    "url": "http://api:5000/headlines",
-                    "sendQuery": true,
-                    "parametersQuery": {
-                    "values": [
-                        {
-                        "name": "page",
-                        "valueProvider": "modelOptional"
-                        }
-                    ]
-                    }
-                },
-                "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
-                "typeVersion": 1.1,
-                "position": [
-                    500,
-                    300
-                ],
-                "id": "10f4582c-8c6e-4e2c-aa09-3aad94cf4623",
-                "name": "HTTP Request"
-            },
-            {
-                "parameters": {
-                    "toolDescription": "Get the books",
-                    "url": "http://api:5000/books?page=1&limit=100"
-                },
-                "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
-                "typeVersion": 1.1,
-                "position": [
-                    700,
-                    300
-                ],
-                "id": "5339b607-7836-4285-8c6a-18c2ce25a783",
-                "name": "HTTP Request1"
-            },
-            {
-                "parameters": {
-                    "options": {}
-                },
-                "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
-                "typeVersion": 1,
-                "position": [
-                    160,
-                    280
-                ],
-                "id": "2bc4deab-eeb4-4169-a79a-c25b9728fcec",
-                "name": "OpenRouter Chat Model",
-                "credentials": {
-                    "openRouterApi": {
-                        "id": "jHchk9hmIymL9fir",
-                        "name": "OpenRouter account"
-                    }
-                }
+              "id": "aae547bd-d344-4d97-a70c-12376acdf8fd",
+              "name": "query.sessionId",
+              "value": "={{ $json.query.sessionId }}",
+              "type": "string"
             }
-        ],
-        "connections": {
-            "Webhook /ask": {
-                "main": [
-                    [
-                        {
-                            "node": "Edit Fields",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "Edit Fields": {
-                "main": [
-                    [
-                        {
-                            "node": "AI Agent",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "AI Agent": {
-                "main": [
-                    [
-                        {
-                            "node": "Respond to Webhook",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "HTTP Request": {
-                "ai_tool": [
-                    [
-                        {
-                            "node": "AI Agent",
-                            "type": "ai_tool",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "HTTP Request1": {
-                "ai_tool": [
-                    [
-                        {
-                            "node": "AI Agent",
-                            "type": "ai_tool",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "OpenRouter Chat Model": {
-                "ai_languageModel": [
-                    [
-                        {
-                            "node": "AI Agent",
-                            "type": "ai_languageModel",
-                            "index": 0
-                        }
-                    ]
-                ]
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        0
+      ],
+      "id": "58a6391c-7a43-4141-8511-bec3cd666b2b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "9a3a86bd-3172-4b24-a9ab-51e7347a61dc",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.query.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a helpful assistant that will provide the user information about two main topics: books and news taken from hacker News."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        420,
+        0
+      ],
+      "id": "38a4cea3-9bbc-4899-a0b1-02f75e06d131",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get the top news of Hacker News",
+        "url": "http://api:5000/headlines",
+        "sendQuery": true,
+        "parametersQuery": {
+          "values": [
+            {
+              "name": "page",
+              "valueProvider": "modelOptional"
             }
-        },
-        "settings": {
-            "executionOrder": "v1"
-        },
-        "staticData": null,
-        "meta": {
-            "templateCredsSetupCompleted": true,
-            "instanceId": "654494a1515665454d5a7043e0478e52333ffb9e97376b51c180b0fd7109a282"
-        },
-        "pinData": {},
-        "versionId": "dbb244a3-38d3-4998-b97d-4266cb987ebf",
-        "triggerCount": 0,
-        "tags": []
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        300
+      ],
+      "id": "10f4582c-8c6e-4e2c-aa09-3aad94cf4623",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get the books",
+        "url": "http://api:5000/books?page=1&limit=100"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        700,
+        300
+      ],
+      "id": "5339b607-7836-4285-8c6a-18c2ce25a783",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        160,
+        300
+      ],
+      "id": "2bc4deab-eeb4-4169-a79a-c25b9728fcec",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "jHchk9hmIymL9fir",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.query.sessionId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        340,
+        320
+      ],
+      "id": "adae9c6c-3797-427b-a0f9-4a8d9d10c838",
+      "name": "Simple Memory"
     }
-]
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook /ask": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f6092315-94ad-4704-8746-11db39759abd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d03c9b3e8099f6091baa6ece5f9cbf7313c582af0db0a8a7fe4eb19611a8c253"
+  },
+  "id": "lcf2jg0YvyMyMTxJ",
+  "tags": []
+}
